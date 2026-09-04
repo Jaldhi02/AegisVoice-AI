@@ -1,0 +1,93 @@
+[
+  {
+    "id": "legit_001",
+    "text": "Hello, this is Sarah from Dr. Smith's office calling to confirm your dental checkup tomorrow at 2 PM. Please let us know if you need to reschedule.",
+    "label": "genuine",
+    "is_scam": 0,
+    "category": "appointment"
+  },
+  {
+    "id": "legit_002",
+    "text": "Hi Dad, just letting you know I reached campus safely. Traffic was fine. I will call you later tonight after dinner.",
+    "label": "genuine",
+    "is_scam": 0,
+    "category": "personal"
+  },
+  {
+    "id": "legit_003",
+    "text": "Your package from Amazon is scheduled for delivery between 3 PM and 5 PM today. The driver will leave it by your front door if no one answers.",
+    "label": "genuine",
+    "is_scam": 0,
+    "category": "delivery"
+  },
+  {
+    "id": "legit_004",
+    "text": "Good morning, thank you for calling customer support. My name is Alex. How may I assist you with your internet service today?",
+    "label": "genuine",
+    "is_scam": 0,
+    "category": "support"
+  },
+  {
+    "id": "legit_005",
+    "text": "Hey Mike, are we still meeting for lunch at noon? Let me know if that works for you or if we should push it to 12:30.",
+    "label": "genuine",
+    "is_scam": 0,
+    "category": "personal"
+  },
+  {
+    "id": "legit_006",
+    "text": "This is an automated alert from your utility provider. Your monthly electricity statement of forty-two dollars is ready for online review.",
+    "label": "genuine",
+    "is_scam": 0,
+    "category": "billing"
+  },
+  {
+    "id": "scam_001",
+    "text": "URGENT WARNING: This is officer Davis from Federal Tax Enforcement. A warrant has been issued for your immediate arrest due to tax fraud. Press one now and pay your outstanding fine via gift card to avoid police dispatch.",
+    "label": "scam",
+    "is_scam": 1,
+    "category": "authority_threat"
+  },
+  {
+    "id": "scam_002",
+    "text": "Security Alert from Chase Bank: A suspicious withdrawal of nine hundred dollars was attempted on your debit card. To protect your funds, read back the six-digit one-time passcode OTP sent to your phone right now.",
+    "label": "scam",
+    "is_scam": 1,
+    "category": "otp_harvesting"
+  },
+  {
+    "id": "scam_003",
+    "text": "Congratulations! Your phone number won a two million dollar international lottery sweepstakes. To release your jackpot prize, you must wire a processing transfer fee of five hundred dollars immediately.",
+    "label": "scam",
+    "is_scam": 1,
+    "category": "lottery_fraud"
+  },
+  {
+    "id": "scam_004",
+    "text": "Hello, this is Microsoft Windows certified security. We have detected malicious Trojan viruses transmitting your passwords from your computer. Download AnyDesk remote access software immediately so our engineer can fix it.",
+    "label": "scam",
+    "is_scam": 1,
+    "category": "tech_support"
+  },
+  {
+    "id": "scam_005",
+    "text": "Mom, it's me! I had a terrible accident in another city and my phone is broken. I'm at the police station and I need you to wire bail money immediately through Bitcoin or Western Union please hurry!",
+    "label": "scam",
+    "is_scam": 1,
+    "category": "family_emergency_impersonation"
+  },
+  {
+    "id": "scam_006",
+    "text": "This is Bank Fraud Department. Your credit card has been compromised in an unauthorized overseas transaction. Verify your card number, expiration date, and CVV security code on the back to prevent permanent account suspension.",
+    "label": "scam",
+    "is_scam": 1,
+    "category": "financial_phishing"
+  },
+  {
+    "id": "scam_007",
+    "text": "Critical notice from Social Security Administration: Your social security number has been suspended due to criminal activity. Wire funds immediately to a safe government account to resolve this issue before law enforcement arrives.",
+    "label": "scam",
+    "is_scam": 1,
+    "category": "authority_threat"
+  }
+]

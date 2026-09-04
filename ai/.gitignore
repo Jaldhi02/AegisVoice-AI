@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+*$py.class
+.ipynb_checkpoints/
+.pytest_cache/
+
+# Raw datasets - too large for GitHub
+data/raw/
+*.zip
+
+# macOS
+.DS_Store
