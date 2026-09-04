@@ -52,10 +52,10 @@ const Profile = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-100 tracking-tight">
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
             Security Analyst Profile
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1">
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
             Authenticated identity, access authorizations, and backend API telemetry
           </p>
         </div>
@@ -65,16 +65,16 @@ const Profile = () => {
             type="button"
             onClick={fetchProfile}
             disabled={loading}
-            className="inline-flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700 transition-colors disabled:opacity-50"
+            className="inline-flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-lg bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 transition-colors shadow-xs disabled:opacity-50"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
-            <span>Sync with /api/auth/me</span>
+            <span>Sync /api/auth/me</span>
           </button>
 
           <button
             type="button"
             onClick={logout}
-            className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg bg-rose-950/60 hover:bg-rose-900 text-rose-300 border border-rose-800/60 transition-colors"
+            className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition-colors"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span>Terminate Session</span>
@@ -92,15 +92,15 @@ const Profile = () => {
       )}
 
       {success && (
-        <div className="p-4 rounded-lg bg-emerald-950/40 border border-emerald-500/40 text-emerald-200 text-sm flex items-center justify-between">
+        <div className="p-4 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-900 text-sm flex items-center justify-between shadow-xs">
           <span className="flex items-center gap-2">
-            <CheckCircle className="w-4 h-4 text-emerald-400" />
+            <CheckCircle className="w-4 h-4 text-emerald-600" />
             {success}
           </span>
           <button
             type="button"
             onClick={() => setSuccess(null)}
-            className="text-xs text-emerald-400 underline"
+            className="text-xs text-emerald-700 underline font-medium"
           >
             Dismiss
           </button>
@@ -109,30 +109,30 @@ const Profile = () => {
 
       {/* Main Profile Info Card */}
       <div className="cyber-panel p-6 sm:p-8 space-y-6">
-        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 pb-6 border-b border-slate-800 text-center sm:text-left">
-          <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-cyan-600 to-blue-600 p-0.5 shadow-lg shadow-cyan-500/20 shrink-0">
-            <div className="w-full h-full bg-slate-900 rounded-2xl flex items-center justify-center text-cyan-400 text-3xl font-bold font-mono">
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 pb-6 border-b border-slate-200 text-center sm:text-left">
+          <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-sky-500 to-blue-600 p-0.5 shadow-md shadow-sky-500/20 shrink-0">
+            <div className="w-full h-full bg-white rounded-2xl flex items-center justify-center text-sky-700 text-3xl font-bold font-mono">
               {profileData?.full_name ? profileData.full_name.charAt(0).toUpperCase() : (profileData?.email ? profileData.email.charAt(0).toUpperCase() : "A")}
             </div>
           </div>
 
           <div className="space-y-1">
             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-              <h2 className="text-xl font-bold text-slate-100">
+              <h2 className="text-xl font-bold text-slate-900">
                 {profileData?.full_name || profileData?.name || "Cybersecurity Analyst"}
               </h2>
-              <span className="px-2.5 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 text-xs font-semibold">
+              <span className="px-2.5 py-0.5 rounded-full bg-sky-50 border border-sky-200 text-sky-800 text-xs font-semibold">
                 {profileData?.role || "SOC Tier-2 Forensic Specialist"}
               </span>
             </div>
 
-            <div className="flex items-center justify-center sm:justify-start gap-2 text-xs text-slate-400 font-mono">
-              <Mail className="w-3.5 h-3.5 text-slate-500" />
+            <div className="flex items-center justify-center sm:justify-start gap-2 text-xs text-slate-600 font-mono">
+              <Mail className="w-3.5 h-3.5 text-slate-400" />
               <span>{profileData?.email || "analyst@aegisvoice.internal"}</span>
             </div>
 
             <div className="flex items-center justify-center sm:justify-start gap-2 text-xs text-slate-500">
-              <Calendar className="w-3.5 h-3.5" />
+              <Calendar className="w-3.5 h-3.5 text-slate-400" />
               <span>Identity Registered: {profileData?.created_at ? new Date(profileData.created_at).toLocaleDateString() : "Active Clearance"}</span>
             </div>
           </div>
@@ -140,29 +140,29 @@ const Profile = () => {
 
         {/* Credentials & Access Info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-2">
-            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
-              <Shield className="w-4 h-4 text-cyan-400" />
+          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-700">
+              <Shield className="w-4 h-4 text-sky-600" />
               <span>Access Clearance & Privileges</span>
             </div>
-            <p className="text-xs text-slate-300">
-              Authorized to upload audio feeds, invoke full neural forensic models (<code className="text-cyan-400">/api/analysis/full</code>), and export threat incidents.
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Authorized to upload audio feeds, invoke full neural forensic models (<code className="text-sky-700 font-mono font-semibold">/api/analysis/full</code>), and export threat incidents.
             </p>
-            <div className="pt-2 flex items-center gap-1.5 text-xs text-emerald-400 font-medium">
+            <div className="pt-2 flex items-center gap-1.5 text-xs text-emerald-700 font-semibold">
               <CheckCircle className="w-3.5 h-3.5" />
               <span>High-Risk Triage Allowed</span>
             </div>
           </div>
 
-          <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-2">
-            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
-              <Key className="w-4 h-4 text-cyan-400" />
+          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-700">
+              <Key className="w-4 h-4 text-sky-600" />
               <span>Active JWT Token Session</span>
             </div>
-            <p className="text-xs text-slate-300 font-mono break-all line-clamp-2">
+            <p className="text-xs text-slate-600 font-mono break-all line-clamp-2">
               {token ? `${token.slice(0, 30)}...${token.slice(-15)}` : "No bearer token currently loaded."}
             </p>
-            <div className="pt-2 flex items-center gap-1.5 text-xs text-emerald-400 font-medium">
+            <div className="pt-2 flex items-center gap-1.5 text-xs text-emerald-700 font-semibold">
               <Lock className="w-3.5 h-3.5" />
               <span>Authorization Bearer Attached</span>
             </div>
@@ -172,29 +172,29 @@ const Profile = () => {
 
       {/* Backend API Contract Configuration */}
       <div className="cyber-panel p-6 space-y-4">
-        <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-200">
           <div className="flex items-center gap-2.5">
-            <Server className="w-5 h-5 text-cyan-400" />
-            <h3 className="font-bold text-slate-100 text-sm sm:text-base">
+            <Server className="w-5 h-5 text-sky-600" />
+            <h3 className="font-bold text-slate-900 text-sm sm:text-base">
               Backend Integration Gateway
             </h3>
           </div>
-          <span className="text-xs font-mono text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800">
-            ENV CONFIGURED
+          <span className="text-xs font-mono font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+            FASTAPI CONFIGURED
           </span>
         </div>
 
         <div className="space-y-3 text-xs">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-lg bg-slate-900/70 border border-slate-800 gap-2">
-            <span className="text-slate-400">Target Base API URL:</span>
-            <span className="font-mono text-cyan-300 font-semibold">{apiBaseUrl}</span>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-lg bg-slate-50 border border-slate-200 gap-2">
+            <span className="text-slate-600 font-medium">Target Base API URL:</span>
+            <span className="font-mono text-sky-800 font-semibold">{apiBaseUrl}</span>
           </div>
 
-          <div className="p-3 rounded-lg bg-slate-900/40 border border-slate-800/80 space-y-1.5">
-            <span className="text-slate-400 font-semibold uppercase tracking-wider text-[11px] block">
+          <div className="p-3 rounded-lg bg-slate-50 border border-slate-200 space-y-1.5">
+            <span className="text-slate-700 font-semibold uppercase tracking-wider text-[11px] block">
               Contract Endpoints Active:
             </span>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 font-mono text-[11px] text-slate-300">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 font-mono text-[11px] text-slate-600">
               <div>• POST /api/auth/login</div>
               <div>• POST /api/auth/register</div>
               <div>• GET /api/auth/me</div>

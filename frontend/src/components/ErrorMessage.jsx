@@ -1,49 +1,40 @@
 import React from "react";
-import { AlertCircle, RefreshCw, X } from "lucide-react";
+import { AlertCircle, X, RefreshCw } from "lucide-react";
 
-const ErrorMessage = ({
-  title = "Error Encountered",
-  message = "Failed to communicate with the security server. Please check your network or try again.",
-  onRetry,
-  onDismiss,
-  className = "",
-}) => {
+const ErrorMessage = ({ title = "Operation Failed", message, onRetry, onDismiss, className = "" }) => {
+  if (!message) return null;
+
   return (
     <div
+      className={`p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 shadow-sm flex items-start justify-between gap-3 ${className}`}
       role="alert"
-      className={`rounded-lg border border-rose-500/30 bg-rose-950/30 p-4 text-rose-200 backdrop-blur-sm ${className}`}
     >
       <div className="flex items-start gap-3">
-        <div className="rounded-md bg-rose-900/50 p-2 text-rose-400 mt-0.5 shrink-0">
-          <AlertCircle className="w-5 h-5" />
+        <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
+        <div>
+          {title && <h3 className="text-xs font-bold uppercase tracking-wider text-rose-800">{title}</h3>}
+          <p className="text-xs text-rose-700 mt-0.5 leading-relaxed">{message}</p>
         </div>
+      </div>
 
-        <div className="flex-1 min-w-0">
-          <h4 className="text-sm font-semibold text-rose-100">{title}</h4>
-          <p className="mt-1 text-sm text-rose-300/90 break-words leading-relaxed">
-            {typeof message === "string" ? message : JSON.stringify(message)}
-          </p>
-
-          {onRetry && (
-            <div className="mt-3">
-              <button
-                type="button"
-                onClick={onRetry}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 border border-rose-500/40 transition-colors"
-              >
-                <RefreshCw className="w-3.5 h-3.5" />
-                Retry Request
-              </button>
-            </div>
-          )}
-        </div>
+      <div className="flex items-center gap-2 shrink-0">
+        {onRetry && (
+          <button
+            type="button"
+            onClick={onRetry}
+            className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg bg-white hover:bg-rose-100 text-rose-800 border border-rose-300 transition-colors shadow-xs"
+          >
+            <RefreshCw className="w-3 h-3" />
+            <span>Retry</span>
+          </button>
+        )}
 
         {onDismiss && (
           <button
             type="button"
             onClick={onDismiss}
-            className="text-rose-400 hover:text-rose-200 p-1 rounded transition-colors"
-            aria-label="Dismiss error"
+            className="p-1 rounded-lg text-rose-500 hover:text-rose-800 hover:bg-rose-100 transition-colors"
+            aria-label="Dismiss message"
           >
             <X className="w-4 h-4" />
           </button>

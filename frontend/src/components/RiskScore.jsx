@@ -1,82 +1,69 @@
 import React from "react";
-import { getRiskMeta } from "./RiskBadge";
 
-const RiskScore = ({ score = 0, confidence, size = "md", showDetails = true, label = "Threat Score" }) => {
-  const numericScore = Math.max(0, Math.min(100, Math.round(Number(score) || 0)));
-  const meta = getRiskMeta(numericScore);
+const RiskScore = ({ score, confidence, size = "md", showDetails = true, label = "Threat Score" }) => {
+  const numericScore = typeof score === "number" ? Math.min(100, Math.max(0, score)) : 0;
 
-  // SVG Circular Gauge calculations
-  const radius = size === "lg" ? 48 : size === "sm" ? 28 : 38;
-  const stroke = size === "lg" ? 8 : size === "sm" ? 5 : 6;
-  const normalizedRadius = radius - stroke * 2;
-  const circumference = normalizedRadius * 2 * Math.PI;
-  const strokeDashoffset = circumference - (numericScore / 100) * circumference;
+  let colorClass = "text-emerald-600";
+  let bgBarClass = "bg-emerald-500";
+  let trackBg = "bg-emerald-100";
 
-  const colorMap = {
-    LOW: "#10b981",
-    MEDIUM: "#f59e0b",
-    HIGH: "#ef4444",
-    CRITICAL: "#dc2626",
-    UNKNOWN: "#64748b",
+  if (numericScore >= 80) {
+    colorClass = "text-red-600";
+    bgBarClass = "bg-red-500";
+    trackBg = "bg-red-100";
+  } else if (numericScore >= 60) {
+    colorClass = "text-rose-600";
+    bgBarClass = "bg-rose-500";
+    trackBg = "bg-rose-100";
+  } else if (numericScore >= 35) {
+    colorClass = "text-amber-600";
+    bgBarClass = "bg-amber-500";
+    trackBg = "bg-amber-100";
+  }
+
+  const sizeConfigs = {
+    sm: {
+      text: "text-sm font-bold font-mono",
+      barHeight: "h-1.5",
+    },
+    md: {
+      text: "text-lg font-bold font-mono",
+      barHeight: "h-2",
+    },
+    lg: {
+      text: "text-3xl font-extrabold font-mono",
+      barHeight: "h-2.5",
+    },
   };
 
-  const strokeColor = colorMap[meta.level] || "#64748b";
+  const config = sizeConfigs[size] || sizeConfigs.md;
 
   return (
-    <div className="flex items-center gap-4">
-      <div className="relative inline-flex items-center justify-center">
-        <svg
-          height={radius * 2}
-          width={radius * 2}
-          className="transform -rotate-90 transition-transform duration-500"
-        >
-          {/* Background circle */}
-          <circle
-            stroke="#1e293b"
-            fill="transparent"
-            strokeWidth={stroke}
-            r={normalizedRadius}
-            cx={radius}
-            cy={radius}
-          />
-          {/* Progress circle */}
-          <circle
-            stroke={strokeColor}
-            fill="transparent"
-            strokeWidth={stroke}
-            strokeDasharray={`${circumference} ${circumference}`}
-            style={{
-              strokeDashoffset,
-              transition: "stroke-dashoffset 0.8s ease-in-out, stroke 0.5s ease",
-            }}
-            strokeLinecap="round"
-            r={normalizedRadius}
-            cx={radius}
-            cy={radius}
-          />
-        </svg>
-
-        <div className="absolute flex flex-col items-center justify-center text-center">
-          <span className={`font-bold font-mono tracking-tight text-slate-100 ${size === "lg" ? "text-2xl" : size === "sm" ? "text-sm" : "text-lg"}`}>
-            {numericScore}%
-          </span>
-        </div>
-      </div>
-
-      {showDetails && (
-        <div className="flex flex-col">
-          <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+    <div className="flex flex-col gap-1 w-full max-w-[200px]">
+      <div className="flex items-baseline justify-between gap-2">
+        {showDetails && (
+          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
             {label}
           </span>
-          <span className={`text-sm font-bold ${meta.textColor}`}>
-            {meta.label}
-          </span>
-          {confidence !== undefined && (
-            <span className="text-xs text-slate-400 mt-0.5">
-              Confidence: {Math.round(confidence * 100 > 100 ? confidence : confidence * 100)}%
-            </span>
-          )}
-        </div>
+        )}
+        <span className={`${config.text} ${colorClass}`}>
+          {numericScore}
+          <span className="text-xs text-slate-400 font-sans font-normal ml-0.5">/100</span>
+        </span>
+      </div>
+
+      {/* Progress Bar */}
+      <div className={`w-full ${trackBg} rounded-full ${config.barHeight} overflow-hidden`}>
+        <div
+          className={`${bgBarClass} ${config.barHeight} rounded-full transition-all duration-500 ease-out`}
+          style={{ width: `${numericScore}%` }}
+        />
+      </div>
+
+      {showDetails && confidence !== undefined && (
+        <span className="text-[10px] text-slate-500 text-right font-mono">
+          Confidence: {(confidence > 1 ? confidence : confidence * 100).toFixed(1)}%
+        </span>
       )}
     </div>
   );
