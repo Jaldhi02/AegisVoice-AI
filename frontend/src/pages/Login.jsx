@@ -54,14 +54,14 @@ const ParticleNetwork = () => {
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseleave", handleMouseLeave);
 
-    // Particle nodes configuration
-    const particleCount = Math.min(Math.floor((width * height) / 14000), 85);
+    // Particle nodes configuration (higher density & vibrant visibility)
+    const particleCount = Math.min(Math.floor((width * height) / 10000), 110);
     const particles = [];
     const colors = [
-      { r: 2, g: 132, b: 199 },   // sky-600
-      { r: 14, g: 165, b: 233 },  // sky-500
-      { r: 37, g: 99, b: 235 },   // blue-600
-      { r: 79, g: 70, b: 229 },   // indigo-600
+      { r: 2, g: 132, b: 199 },   // electric sky-600
+      { r: 14, g: 165, b: 233 },  // cyan-500
+      { r: 37, g: 99, b: 235 },   // royal blue-600
+      { r: 30, g: 58, b: 138 },   // sapphire blue-900
     ];
 
     for (let i = 0; i < particleCount; i++) {
@@ -69,16 +69,16 @@ const ParticleNetwork = () => {
       particles.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.7,
-        vy: (Math.random() - 0.5) * 0.7,
-        radius: Math.random() * 1.8 + 1.2,
+        vx: (Math.random() - 0.5) * 0.75,
+        vy: (Math.random() - 0.5) * 0.75,
+        radius: Math.random() * 2.2 + 2.0,
         color: color,
-        alpha: Math.random() * 0.4 + 0.25,
+        alpha: Math.random() * 0.3 + 0.65,
         pulseSpeed: Math.random() * 0.02 + 0.008,
       });
     }
 
-    const maxDistance = 125;
+    const maxDistance = 140;
 
     // Main animation loop
     const render = () => {
@@ -96,15 +96,15 @@ const ParticleNetwork = () => {
         if (p.y < 0 || p.y > height) p.vy *= -1;
 
         // Subtle alpha pulsation
-        p.alpha += Math.sin(Date.now() * p.pulseSpeed) * 0.003;
-        const currentAlpha = Math.max(0.15, Math.min(0.65, p.alpha));
+        p.alpha += Math.sin(Date.now() * p.pulseSpeed) * 0.002;
+        const currentAlpha = Math.max(0.45, Math.min(0.95, p.alpha));
 
-        // Draw particle dot with subtle blue glow
+        // Draw particle dot with cyan/blue glow
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(${p.color.r}, ${p.color.g}, ${p.color.b}, ${currentAlpha})`;
-        ctx.shadowBlur = 6;
-        ctx.shadowColor = `rgba(${p.color.r}, ${p.color.g}, ${p.color.b}, 0.5)`;
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = `rgba(${p.color.r}, ${p.color.g}, ${p.color.b}, 0.7)`;
         ctx.fill();
         ctx.shadowBlur = 0; // reset for lines
 
@@ -116,12 +116,12 @@ const ParticleNetwork = () => {
           const dist = Math.sqrt(dx * dx + dy * dy);
 
           if (dist < maxDistance) {
-            const lineAlpha = (1 - dist / maxDistance) * 0.22;
+            const lineAlpha = (1 - dist / maxDistance) * 0.52;
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(p2.x, p2.y);
             ctx.strokeStyle = `rgba(2, 132, 199, ${lineAlpha})`;
-            ctx.lineWidth = 0.85;
+            ctx.lineWidth = 1.25;
             ctx.stroke();
           }
         }
@@ -133,12 +133,12 @@ const ParticleNetwork = () => {
           const dist = Math.sqrt(dx * dx + dy * dy);
 
           if (dist < mouse.radius) {
-            const mouseLineAlpha = (1 - dist / mouse.radius) * 0.35;
+            const mouseLineAlpha = (1 - dist / mouse.radius) * 0.7;
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(mouse.x, mouse.y);
             ctx.strokeStyle = `rgba(14, 165, 233, ${mouseLineAlpha})`;
-            ctx.lineWidth = 1;
+            ctx.lineWidth = 1.6;
             ctx.stroke();
           }
         }
@@ -160,7 +160,7 @@ const ParticleNetwork = () => {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none z-0 opacity-70"
+      className="fixed inset-0 pointer-events-none z-0 opacity-100"
     />
   );
 };
