@@ -11,13 +11,13 @@ import {
   Filter,
   Download,
 } from "lucide-react";
-import callService from "../services/callService";
+import alertService from "../services/alertService";
 import RiskBadge from "../components/RiskBadge";
 import Loading from "../components/Loading";
 import ErrorMessage from "../components/ErrorMessage";
 
 const Alerts = () => {
-  const [calls, setCalls] = useState([]);
+  const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -35,9 +35,8 @@ const Alerts = () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await callService.getCalls();
-      const callList = Array.isArray(data) ? data : (data?.calls || []);
-      setCalls(callList);
+      const data = await alertService.getAlerts();
+      setAlerts(data?.alerts || []);
     } catch (err) {
       console.error("Failed to load alerts:", err);
       setError(err.message || "Failed to retrieve security threat incidents.");
@@ -51,19 +50,15 @@ const Alerts = () => {
   }, []);
 
   const alertsList = useMemo(() => {
-    return calls
-      .filter((call) => {
-        const score = call.risk_score ?? call.score ?? 0;
-        return score >= 35 || call.is_synthetic || call.status === "fraud";
-      })
-      .map((call) => {
-        const score = call.risk_score ?? call.score ?? 0;
+    return alerts
+      .map((alert) => {
+        const score = alert.risk_score ?? 0;
         let severity = "SUSPICIOUS";
         if (score >= 80) severity = "CRITICAL";
-        else if (score >= 60 || call.is_synthetic) severity = "HIGH";
+        else if (score >= 60) severity = "HIGH";
 
         return {
-          ...call,
+          ...alert,
           derivedSeverity: severity,
         };
       })
@@ -78,14 +73,18 @@ const Alerts = () => {
         const dateB = new Date(b.created_at || b.timestamp || 0).getTime();
         return dateB - dateA;
       });
-  }, [calls, severityFilter]);
+  }, [alerts, severityFilter]);
 
-  const toggleReviewed = (id) => {
-    setReviewedIds((prev) => {
-      const updated = prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id];
-      localStorage.setItem("reviewed_alerts", JSON.stringify(updated));
-      return updated;
-    });
+  const toggleReviewed = async (id, isReviewed) => {
+    try {
+      const updatedAlert = await alertService.updateAlert(id, isReviewed ? "UNREAD" : "RESOLVED");
+      setAlerts((current) => current.map((alert) => (alert.id === id ? updatedAlert : alert)));
+      setReviewedIds((current) =>
+        isReviewed ? current.filter((item) => item !== id) : [...current, id]
+      );
+    } catch (err) {
+      setError(err.message || "Could not update alert status.");
+    }
   };
 
   const handleExportJSON = () => {
@@ -193,8 +192,8 @@ const Alerts = () => {
             const id = alert._id || alert.id;
             const isReviewed = reviewedIds.includes(id);
             const score = alert.risk_score ?? alert.score ?? 85;
-            const caller = alert.caller_number || alert.phone_number || "Masked Caller";
-            const scamCategory = alert.scam_type || alert.scam_analysis?.scam_type || "Synthetic Voice Cloning & Urgency Coercion";
+            const caller = alert.call_id ? `Call ${String(alert.call_id).slice(-8)}` : "Unknown Call";
+            const scamCategory = alert.message || "Security alert";
             const date = new Date(alert.created_at || alert.timestamp || Date.now()).toLocaleString();
 
             return (
@@ -257,7 +256,7 @@ const Alerts = () => {
                   <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-2.5 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-800">
                     <button
                       type="button"
-                      onClick={() => toggleReviewed(id)}
+                      onClick={() => toggleReviewed(id, isReviewed)}
                       className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors flex items-center gap-1.5 ${
                         isReviewed
                           ? "bg-slate-900 border-slate-700 text-slate-400 hover:text-white"
