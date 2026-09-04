@@ -67,16 +67,10 @@ const CallAnalysis = () => {
     setAnalysisFeedback(null);
 
     try {
-      const result = await analysisService.runFullAnalysis({
-        call_id: callId,
-      });
+      await analysisService.runFullAnalysis(callId);
 
       setAnalysisFeedback("Full AI deepfake & scam forensic analysis completed successfully!");
-      if (result && (result._id || result.id || result.risk_score !== undefined)) {
-        setCall(result);
-      } else {
-        await fetchCallDetails(callId);
-      }
+      await fetchCallDetails(callId);
     } catch (err) {
       console.error("Run full analysis error:", err);
       setError(`Full analysis failed: ${err.message}`);
@@ -96,7 +90,7 @@ const CallAnalysis = () => {
     setError(null);
 
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append("audio", file);
     if (callerNumber) {
       formData.append("caller_number", callerNumber);
     }
