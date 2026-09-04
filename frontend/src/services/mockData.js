@@ -238,11 +238,15 @@ export const saveMockCall = (newCall) => {
 };
 
 export const checkMockMode = () => {
-  // If explicitly enabled via environment variable
-  if (import.meta.env.VITE_USE_MOCK_DATA === "true") return true;
-  // Or if toggled on in localStorage by the user
+  // 1. Manual user toggle in Navbar (localStorage) takes top priority
   const localToggle = localStorage.getItem("aegis_mock_mode");
   if (localToggle !== null) return localToggle === "true";
-  // Default to true for seamless hackathon / offline demonstration
+
+  // 2. Otherwise use environment variable if defined
+  if (import.meta.env.VITE_USE_MOCK_DATA !== undefined) {
+    return import.meta.env.VITE_USE_MOCK_DATA === "true";
+  }
+
+  // 3. Default to true
   return true;
 };
