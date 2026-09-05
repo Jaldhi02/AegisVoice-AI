@@ -8,7 +8,7 @@ const ProtectedRoute = ({ children }) => {
   const location = useLocation();
 
   if (loading) {
-    return <Loading fullScreen message="Authenticating session tokens..." />;
+    return <Loading fullScreen message="Verifying authentication..." />;
   }
 
   if (!isAuthenticated) {

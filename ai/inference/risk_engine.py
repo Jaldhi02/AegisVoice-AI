@@ -149,17 +149,20 @@ def calculate_risk(voice_result, scam_result):
             else:
                 voice_status = "UNKNOWN"
 
-        if "voice_confidence" in voice_result:
+        clone_p = voice_result.get("clone_probability")
+        if clone_p is not None:
+            p_voice = float(clone_p)
+            voice_confidence = float(round(p_voice if voice_status == "AI_GENERATED" else (1.0 - p_voice), 4))
+        elif voice_result.get("voice_confidence") is not None:
             voice_confidence = float(round(float(voice_result["voice_confidence"]), 4))
-        elif "confidence" in voice_result:
+            p_voice = voice_confidence if voice_status == "AI_GENERATED" else (1.0 - voice_confidence)
+        elif voice_result.get("confidence") is not None:
             voice_confidence = float(round(float(voice_result["confidence"]), 4))
-        elif "clone_probability" in voice_result:
-            p = float(voice_result["clone_probability"])
-            voice_confidence = float(round(p if voice_status == "AI_GENERATED" else (1.0 - p), 4))
+            p_voice = voice_confidence if voice_status == "AI_GENERATED" else (1.0 - voice_confidence)
         else:
             voice_confidence = 0.0
+            p_voice = 1.0 if voice_status == "AI_GENERATED" else 0.0
 
-        p_voice = float(voice_result.get("clone_probability", 1.0 if voice_status == "AI_GENERATED" else 0.0))
         is_clone = (voice_status == "AI_GENERATED")
     else:
         voice_status = "UNKNOWN"

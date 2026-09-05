@@ -22,7 +22,7 @@ const AppLayout = ({ children, alertCount }) => {
   const { isAuthenticated } = useAuth();
 
   return (
-    <div className="min-h-screen bg-cyber-darker text-slate-100 flex flex-col">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
       <Navbar
         onMobileMenuToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         isMobileMenuOpen={isMobileMenuOpen}

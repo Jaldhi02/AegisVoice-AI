@@ -50,17 +50,25 @@ app.add_middleware(
 )
 
 
+from fastapi.encoders import jsonable_encoder
+
 @app.exception_handler(RequestValidationError)
 async def _validation_error(request, exc: RequestValidationError):
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        content={"detail": exc.errors(), "message": "Validation error"},
+        content={"detail": jsonable_encoder(exc.errors()), "message": "Validation error"},
     )
 
 
 _PREFIX = settings.API_PREFIX
 for router in (auth_router, users_router, calls_router, analysis_router, alerts_router, reports_router):
     app.include_router(router, prefix=_PREFIX)
+
+import os
+from fastapi.staticfiles import StaticFiles
+uploads_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../uploads"))
+if os.path.exists(uploads_path):
+    app.mount("/uploads", StaticFiles(directory=uploads_path), name="uploads")
 
 
 @app.get("/", tags=["Health"])

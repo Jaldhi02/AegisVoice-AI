@@ -7,7 +7,7 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 from bson import ObjectId
 
 # Add repo root so `ai.inference` is importable without installing as a package
-_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../../"))
+_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
 if _ROOT not in sys.path:
     sys.path.insert(0, _ROOT)
 
@@ -42,8 +42,8 @@ from app.services.alert_service import AlertService
 
 # Placeholder transcript – replaced when a real STT engine is wired up
 _DEMO_TRANSCRIPT = (
-    "Urgent message from security department: "
-    "Please send me the OTP to verify your bank account."
+    "Urgent alert from SBI Fraud Control Cell: "
+    "Please read back the 6-digit OTP code sent to your handset immediately to prevent bank account suspension."
 )
 
 
@@ -62,9 +62,16 @@ class AnalysisService:
                                 "Provide an audio file or a valid audio_path")
         res = analyze_voice(path)
         return VoiceAnalysisResponse(
-            voice_status=res.get("voice_status", "UNKNOWN"),
+            voice_status=res.get("voice_status", "UNAVAILABLE"),
             voice_confidence=res.get("voice_confidence", 0.0),
+            synthetic_probability=res.get("synthetic_probability"),
+            human_probability=res.get("human_probability"),
+            mixed_probability=res.get("mixed_probability"),
+            clone_similarity=res.get("clone_similarity"),
+            pitch_consistency=res.get("pitch_consistency"),
+            spectral_artifacts=res.get("spectral_artifacts"),
             reasons=res.get("reasons", []),
+            details=res,
         )
 
     @staticmethod
@@ -96,6 +103,7 @@ class AnalysisService:
         """
         saved_path = None
         current_id = call_id
+        record = None
 
         if file is not None:
             saved_path, unique_name, file_size = await save_upload_file(file)
@@ -140,10 +148,9 @@ class AnalysisService:
 
         # Run AI pipeline
         voice_res = analyze_voice(saved_path)
-        # A real Whisper/STT implementation belongs to the AI layer.  Until it is
-        # supplied, retain the explicit demo transcript so the API contract remains
-        # testable without presenting it as a model-generated transcription.
-        transcript = _DEMO_TRANSCRIPT
+        record = record or {}
+        record_analysis = record.get("analysis") or {}
+        transcript = record.get("transcript") or record_analysis.get("transcript", "") if record else ""
         scam_res = analyze_scam(transcript)
         risk = calculate_risk(voice_res, scam_res)
 
@@ -157,21 +164,32 @@ class AnalysisService:
             risk_score=risk["risk_score"],
             risk_level=risk["risk_level"],
             reasons=risk["reasons"],
+            voice_analysis=voice_res,
+            scam_analysis=scam_res,
         )
 
         # Persist results
         now = datetime.now(timezone.utc)
         analysis_data = response.model_dump()
+        update_fields = {
+            "status": "ANALYZED",
+            "analysis": analysis_data,
+            "voice_analysis": voice_res,
+            "scam_analysis": scam_res,
+            "risk_score": risk["risk_score"],
+            "risk_level": risk["risk_level"],
+            "updated_at": now,
+        }
         if db is not None and current_id:
             try:
                 await db["calls"].update_one(
                     {"_id": ObjectId(current_id)},
-                    {"$set": {"status": "ANALYZED", "analysis": analysis_data, "updated_at": now}},
+                    {"$set": update_fields},
                 )
             except Exception:
                 pass
         if current_id and current_id in _calls:
-            _calls[current_id].update({"status": "ANALYZED", "analysis": analysis_data, "updated_at": now})
+            _calls[current_id].update(update_fields)
 
         # Auto-alert on HIGH risk
         if response.risk_level == "HIGH":

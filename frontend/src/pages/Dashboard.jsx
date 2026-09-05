@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   ShieldAlert,
   ShieldCheck,
@@ -20,6 +20,7 @@ import Loading from "../components/Loading";
 import ErrorMessage from "../components/ErrorMessage";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [calls, setCalls] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -74,22 +75,27 @@ const Dashboard = () => {
     setError(null);
 
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append("audio", file);
     if (callerInput) {
       formData.append("caller_number", callerInput);
     }
 
     try {
-      await callService.uploadCall(formData, (progressEvent) => {
+      const response = await callService.uploadCall(formData, (progressEvent) => {
         if (progressEvent.total) {
           const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
           setUploadProgress(progress);
         }
       });
 
-      setUploadSuccess("Audio call successfully uploaded for neural deepfake scanning!");
-      setCallerInput("");
-      fetchDashboardData();
+      const newId = response.call_id || response._id || response.id;
+      if (newId) {
+        navigate(`/analysis/${newId}`);
+      } else {
+        setUploadSuccess("Audio call successfully uploaded for neural deepfake scanning!");
+        setCallerInput("");
+        fetchDashboardData();
+      }
     } catch (err) {
       setError(`Upload failed: ${err.message}`);
     } finally {
@@ -103,10 +109,10 @@ const Dashboard = () => {
       {/* Top Banner & Refresh */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-100 tracking-tight">
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
             Threat Intelligence Dashboard
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1">
+          <p className="text-xs sm:text-sm text-slate-600 mt-1">
             Real-time acoustic neural classification & linguistic scam forensics
           </p>
         </div>
@@ -116,15 +122,15 @@ const Dashboard = () => {
             type="button"
             onClick={fetchDashboardData}
             disabled={loading}
-            className="inline-flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700 transition-colors disabled:opacity-50"
+            className="inline-flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 transition-colors disabled:opacity-50 shadow-sm"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
-            <span>Refresh Telemetry</span>
+            <span>Refresh Dashboard</span>
           </button>
 
           <Link
             to="/analysis"
-            className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 transition-colors shadow-sm shadow-cyan-500/20"
+            className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white transition-colors shadow-sm"
           >
             <UploadCloud className="w-4 h-4" />
             <span>Upload New Call</span>
@@ -134,7 +140,7 @@ const Dashboard = () => {
 
       {error && (
         <ErrorMessage
-          title="Telemetry Synchronization Issue"
+          title="Dashboard Synchronization Issue"
           message={error}
           onRetry={fetchDashboardData}
           onDismiss={() => setError(null)}
@@ -142,12 +148,12 @@ const Dashboard = () => {
       )}
 
       {uploadSuccess && (
-        <div className="p-4 rounded-lg bg-emerald-950/40 border border-emerald-500/40 text-emerald-200 text-sm flex items-center justify-between">
+        <div className="p-4 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-900 text-sm flex items-center justify-between shadow-sm">
           <span>{uploadSuccess}</span>
           <button
             type="button"
             onClick={() => setUploadSuccess(null)}
-            className="text-xs text-emerald-400 underline ml-4"
+            className="text-xs text-emerald-700 underline ml-4 font-semibold"
           >
             Dismiss
           </button>
@@ -159,19 +165,19 @@ const Dashboard = () => {
         {/* Metric 1: Total Calls */}
         <div className="cyber-panel p-5">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
               Calls Scanned
             </span>
-            <div className="p-2 rounded-lg bg-slate-800/80 text-cyan-400 border border-slate-700/50">
+            <div className="p-2 rounded-lg bg-cyan-50 text-cyan-600 border border-cyan-200">
               <PhoneCall className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl font-bold font-mono text-slate-100">{totalScanned}</span>
-            <span className="text-xs text-slate-400">total records</span>
+            <span className="text-3xl font-bold font-mono text-slate-900">{totalScanned}</span>
+            <span className="text-xs text-slate-500">total records</span>
           </div>
-          <div className="mt-3 flex items-center text-xs text-slate-400 gap-1.5">
-            <Activity className="w-3.5 h-3.5 text-cyan-400" />
+          <div className="mt-3 flex items-center text-xs text-slate-600 gap-1.5">
+            <Activity className="w-3.5 h-3.5 text-cyan-600" />
             <span>Continuous neural monitoring</span>
           </div>
         </div>
@@ -179,23 +185,23 @@ const Dashboard = () => {
         {/* Metric 2: Fraud Identified */}
         <div className="cyber-panel p-5">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
               Fraud & Deepfakes
             </span>
-            <div className="p-2 rounded-lg bg-rose-950/70 text-rose-400 border border-rose-800/50">
+            <div className="p-2 rounded-lg bg-rose-50 text-rose-600 border border-rose-200">
               <ShieldAlert className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl font-bold font-mono text-rose-400">
+            <span className="text-3xl font-bold font-mono text-rose-600">
               {fraudCalls.length}
             </span>
-            <span className="text-xs text-slate-400">
+            <span className="text-xs text-slate-500">
               ({totalScanned > 0 ? Math.round((fraudCalls.length / totalScanned) * 100) : 0}%)
             </span>
           </div>
-          <div className="mt-3 flex items-center text-xs text-rose-300 gap-1.5">
-            <AlertOctagon className="w-3.5 h-3.5 text-rose-400" />
+          <div className="mt-3 flex items-center text-xs text-rose-700 gap-1.5 font-medium">
+            <AlertOctagon className="w-3.5 h-3.5 text-rose-600" />
             <span>Immediate review advised</span>
           </div>
         </div>
@@ -203,21 +209,21 @@ const Dashboard = () => {
         {/* Metric 3: Safe Calls */}
         <div className="cyber-panel p-5">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
               Authentic Calls
             </span>
-            <div className="p-2 rounded-lg bg-emerald-950/70 text-emerald-400 border border-emerald-800/50">
+            <div className="p-2 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-200">
               <ShieldCheck className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl font-bold font-mono text-emerald-400">
+            <span className="text-3xl font-bold font-mono text-emerald-600">
               {safeCalls.length}
             </span>
-            <span className="text-xs text-slate-400">verified human</span>
+            <span className="text-xs text-slate-500">verified human</span>
           </div>
-          <div className="mt-3 flex items-center text-xs text-emerald-300 gap-1.5">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+          <div className="mt-3 flex items-center text-xs text-emerald-700 gap-1.5 font-medium">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
             <span>Zero synthetic markers</span>
           </div>
         </div>
@@ -225,10 +231,10 @@ const Dashboard = () => {
         {/* Metric 4: Average Threat Level */}
         <div className="cyber-panel p-5">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
               Avg Threat Score
             </span>
-            <div className="p-2 rounded-lg bg-slate-800/80 text-amber-400 border border-slate-700/50">
+            <div className="p-2 rounded-lg bg-amber-50 text-amber-600 border border-amber-200">
               <TrendingUp className="w-4 h-4" />
             </div>
           </div>
@@ -244,14 +250,11 @@ const Dashboard = () => {
         <div className="lg:col-span-2 space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <h2 className="text-lg font-bold text-slate-100">Recent Call Inspections</h2>
-              <span className="text-xs font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400">
-                GET /api/calls
-              </span>
+              <h2 className="text-lg font-bold text-slate-900">Recent Call Inspections</h2>
             </div>
             <Link
               to="/history"
-              className="text-xs font-medium text-cyan-400 hover:text-cyan-300 flex items-center gap-1"
+              className="text-xs font-semibold text-cyan-600 hover:text-cyan-700 flex items-center gap-1"
             >
               View All History <ArrowRight className="w-3.5 h-3.5" />
             </Link>
@@ -259,16 +262,16 @@ const Dashboard = () => {
 
           {loading && calls.length === 0 ? (
             <div className="cyber-panel p-12">
-              <Loading message="Querying call telemetry from database..." />
+              <Loading message="Loading call data..." />
             </div>
           ) : calls.length === 0 ? (
             <div className="cyber-panel p-12 text-center space-y-4">
-              <div className="w-12 h-12 rounded-full bg-slate-900 border border-slate-700 text-slate-500 mx-auto flex items-center justify-center">
+              <div className="w-12 h-12 rounded-full bg-slate-100 border border-slate-200 text-slate-400 mx-auto flex items-center justify-center">
                 <FileAudio className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-base font-semibold text-slate-200">No Call Recordings Found</h3>
-                <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
+                <h3 className="text-base font-semibold text-slate-800">No Call Recordings Found</h3>
+                <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
                   Upload an audio file (WAV/MP3) using the quick dropzone or the Call Analysis portal to begin real-time fraud inspection.
                 </p>
               </div>
@@ -287,43 +290,42 @@ const Dashboard = () => {
           {/* Quick Upload Widget */}
           <div className="cyber-panel p-5 space-y-4">
             <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-lg bg-cyan-950/60 text-cyan-400 border border-cyan-800/40">
+              <div className="p-2 rounded-lg bg-cyan-50 text-cyan-600 border border-cyan-200">
                 <UploadCloud className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-slate-100">Quick Audio Upload</h3>
-                <span className="text-[11px] text-slate-400 font-mono">POST /api/calls/upload</span>
+                <h3 className="text-sm font-bold text-slate-900">Upload Call Audio</h3>
               </div>
             </div>
 
-            <p className="text-xs text-slate-400">
-              Upload captured voice audio stream for immediate PyTorch deepfake acoustic analysis.
+            <p className="text-xs text-slate-600">
+              Upload captured voice audio stream for immediate AI deepfake acoustic analysis.
             </p>
 
             <div className="space-y-3">
               <div>
-                <label className="block text-[11px] uppercase font-semibold text-slate-400 mb-1">
+                <label className="block text-[11px] uppercase font-semibold text-slate-500 mb-1">
                   Caller Number / ID (Optional)
                 </label>
                 <input
                   type="text"
                   value={callerInput}
                   onChange={(e) => setCallerInput(e.target.value)}
-                  placeholder="+1 (800) 555-0199"
-                  className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-slate-100 placeholder-slate-500 text-xs focus:outline-none focus:border-cyan-500"
+                  placeholder="+91 98765 43210"
+                  className="w-full px-3 py-2 rounded-lg bg-white border border-slate-300 text-slate-900 placeholder-slate-400 text-xs focus:outline-none focus:border-cyan-600 shadow-sm"
                 />
               </div>
 
               <label
                 className={`border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center text-center cursor-pointer transition-colors ${
                   uploading
-                    ? "border-cyan-500 bg-cyan-950/10 cursor-not-allowed"
-                    : "border-slate-700 hover:border-cyan-500 bg-slate-900/50 hover:bg-slate-900"
+                    ? "border-cyan-500 bg-cyan-50/50 cursor-not-allowed"
+                    : "border-slate-300 hover:border-cyan-500 bg-slate-50/60 hover:bg-slate-100/80"
                 }`}
               >
                 <input
                   type="file"
-                  accept="audio/*,.wav,.mp3,.flac,.m4a"
+                  accept="audio/*,.wav,.mp3,.ogg,.webm,.m4a,.flac,.aac"
                   disabled={uploading}
                   onChange={handleQuickUpload}
                   className="hidden"
@@ -335,8 +337,8 @@ const Dashboard = () => {
                   </div>
                 ) : (
                   <>
-                    <FileAudio className="w-8 h-8 text-cyan-400 mb-2" />
-                    <span className="text-xs font-semibold text-slate-200">
+                    <FileAudio className="w-8 h-8 text-cyan-600 mb-2" />
+                    <span className="text-xs font-semibold text-slate-800">
                       Click to upload audio file
                     </span>
                     <span className="text-[10px] text-slate-500 mt-1">
@@ -351,18 +353,18 @@ const Dashboard = () => {
           {/* High-Risk Alerts Highlight */}
           <div className="cyber-panel p-5 space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-slate-100 flex items-center gap-2">
-                <AlertOctagon className="w-4 h-4 text-rose-400" />
+              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <AlertOctagon className="w-4 h-4 text-rose-600" />
                 Critical Incidents
               </h3>
-              <Link to="/alerts" className="text-xs text-cyan-400 hover:underline">
+              <Link to="/alerts" className="text-xs text-cyan-600 font-semibold hover:underline">
                 View All
               </Link>
             </div>
 
             {fraudCalls.length === 0 ? (
-              <div className="p-4 rounded-lg bg-slate-900/60 border border-slate-800 text-center text-xs text-slate-400">
-                <ShieldCheck className="w-5 h-5 text-emerald-400 mx-auto mb-1.5" />
+              <div className="p-4 rounded-lg bg-emerald-50/80 border border-emerald-200 text-center text-xs text-slate-600">
+                <ShieldCheck className="w-5 h-5 text-emerald-600 mx-auto mb-1.5" />
                 No critical fraud threats recorded. System perimeter secure.
               </div>
             ) : (
@@ -370,13 +372,13 @@ const Dashboard = () => {
                 {fraudCalls.slice(0, 3).map((alert) => (
                   <div
                     key={alert._id || alert.id}
-                    className="p-2.5 rounded-lg bg-rose-950/30 border border-rose-900/50 flex items-center justify-between text-xs"
+                    className="p-2.5 rounded-lg bg-rose-50 border border-rose-200 flex items-center justify-between text-xs"
                   >
                     <div>
-                      <div className="font-semibold text-rose-200">
+                      <div className="font-semibold text-rose-900">
                         {alert.caller_number || alert.caller || "Unknown Caller"}
                       </div>
-                      <div className="text-[11px] text-rose-400/80 mt-0.5">
+                      <div className="text-[11px] text-rose-700 mt-0.5">
                         {alert.scam_type || "Synthetic Voice Detected"}
                       </div>
                     </div>

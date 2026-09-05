@@ -10,6 +10,7 @@ class CallUploadResponse(BaseModel):
     duration_seconds: float = 0.0
     status: str = "UPLOADED"
     created_at: datetime
+    audio_url: Optional[str] = None
 
 class CallSummaryItem(BaseModel):
     id: str
@@ -33,4 +34,5 @@ class CallDetailResponse(BaseModel):
     duration_seconds: float = 0.0
     status: str
     created_at: datetime
+    audio_url: Optional[str] = None
     analysis: Optional[FullAnalysisResponse] = None

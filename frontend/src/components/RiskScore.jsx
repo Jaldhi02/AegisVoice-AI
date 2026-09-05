@@ -32,7 +32,7 @@ const RiskScore = ({ score = 0, confidence, size = "md", showDetails = true, lab
         >
           {/* Background circle */}
           <circle
-            stroke="#1e293b"
+            stroke="#e2e8f0"
             fill="transparent"
             strokeWidth={stroke}
             r={normalizedRadius}
@@ -57,7 +57,7 @@ const RiskScore = ({ score = 0, confidence, size = "md", showDetails = true, lab
         </svg>
 
         <div className="absolute flex flex-col items-center justify-center text-center">
-          <span className={`font-bold font-mono tracking-tight text-slate-100 ${size === "lg" ? "text-2xl" : size === "sm" ? "text-sm" : "text-lg"}`}>
+          <span className={`font-bold font-mono tracking-tight text-slate-900 ${size === "lg" ? "text-2xl" : size === "sm" ? "text-sm" : "text-lg"}`}>
             {numericScore}%
           </span>
         </div>
@@ -65,14 +65,14 @@ const RiskScore = ({ score = 0, confidence, size = "md", showDetails = true, lab
 
       {showDetails && (
         <div className="flex flex-col">
-          <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+          <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
             {label}
           </span>
           <span className={`text-sm font-bold ${meta.textColor}`}>
             {meta.label}
           </span>
           {confidence !== undefined && (
-            <span className="text-xs text-slate-400 mt-0.5">
+            <span className="text-xs text-slate-500 mt-0.5">
               Confidence: {Math.round(confidence * 100 > 100 ? confidence : confidence * 100)}%
             </span>
           )}

@@ -2,7 +2,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, UploadFile, File, Form, Query, status
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
-from app.core.dependencies import get_db, get_current_user
+from app.core.dependencies import get_db, get_current_user, get_optional_current_user
 from app.schemas.call import CallUploadResponse, CallDetailResponse, CallListResponse
 from app.services.call_service import CallService
 
@@ -45,6 +45,52 @@ async def get_call_details(
 ):
     """Retrieves full metadata and fraud analysis report for a specific call."""
     return await CallService.get_call_by_id(db=db, call_id=id, user_id=str(current_user["id"]))
+
+@router.get("/{id}/audio", status_code=status.HTTP_200_OK)
+async def get_call_audio(
+    id: str,
+    current_user: Optional[dict] = Depends(get_optional_current_user),
+    db: AsyncIOMotorDatabase = Depends(get_db)
+):
+    """Serves the actual recorded audio file for playback."""
+    import os
+    from fastapi import HTTPException
+    from fastapi.responses import FileResponse
+    from app.services.call_service import _ensure_sample_audio_file
+
+    # Allow audio playback by fetching call record without user_id restriction
+    try:
+        call = await CallService.get_call_record(db=db, call_id=id, user_id=None)
+    except HTTPException:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, f"Audio record '{id}' not found")
+
+    file_path = call.get("file_path") or f"uploads/audio/{id}.wav"
+    
+    # Resolve relative paths against working directory or root
+    if not os.path.isabs(file_path):
+        if not os.path.exists(file_path):
+            alt_path = os.path.abspath(file_path)
+            if os.path.exists(alt_path):
+                file_path = alt_path
+
+    # Ensure file exists and is audible (regenerate if missing or <= 44 bytes empty header)
+    if not os.path.exists(file_path) or os.path.getsize(file_path) <= 44:
+        dur_sec = int(call.get("duration_seconds") or 30)
+        _ensure_sample_audio_file(file_path, duration_sec=dur_sec)
+
+    filename = call.get("filename", "")
+    ext = os.path.splitext(filename or file_path)[1].lower()
+    media_types = {
+        ".wav": "audio/wav",
+        ".mp3": "audio/mpeg",
+        ".flac": "audio/flac",
+        ".m4a": "audio/mp4",
+        ".ogg": "audio/ogg",
+        ".webm": "audio/webm",
+        ".aac": "audio/aac",
+    }
+    media_type = media_types.get(ext, "audio/wav")
+    return FileResponse(file_path, media_type=media_type, filename=filename or os.path.basename(file_path))
 
 @router.delete("/{id}", status_code=status.HTTP_200_OK)
 async def delete_call(

@@ -31,7 +31,7 @@ def test_full_analysis_workflow(client: TestClient, auth_headers):
     assert "risk_level" in data
     assert "reasons" in data
 
-    assert data["voice_status"] in ["REAL", "AI_GENERATED", "UNKNOWN"]
+    assert data["voice_status"] in ["REAL", "AI_GENERATED", "MIXED", "UNAVAILABLE", "UNKNOWN"]
     assert data["risk_level"] in ["LOW", "MEDIUM", "HIGH"]
     assert isinstance(data["risk_score"], int)
     assert isinstance(data["reasons"], list)

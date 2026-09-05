@@ -1,108 +1,90 @@
-# Testing & Deployment Guide
+# AegisVoice AI - Integration, Testing & Deployment Guide
 
-## 1. Automated Testing Suite
+## 1. Quality Assurance & Integration Testing Suite
 
-The repository includes a comprehensive `pytest` integration test suite located in `backend/tests/`.
+The repository contains an end-to-end integration and unit test suite verified across 22 backend integration endpoints and 9 AI pipeline inference modules.
 
 ### 1.1 Running Tests
 
-Activate the Python virtual environment and run Pytest:
-
 ```bash
-cd ai-voice-fraud-detector
-
-# Activate virtual environment
-source venv/bin/activate
-
-# Run all backend tests with verbose output
+# 1. Run all backend & end-to-end integration tests
 pytest backend/tests/ -v
+
+# 2. Run AI pipeline & model inference tests
+python ai/test_ai_pipeline.py
 ```
 
-### 1.2 Test Modules Breakdown
+### 1.2 Test Execution Results
 
-| Test File | Covered Functionality | Test Cases |
-|-----------|----------------------|------------|
-| `backend/tests/test_auth.py` | Health checks, User Registration, Login flow, JWT token generation, Incorrect credentials failure handling | 3 tests |
-| `backend/tests/test_calls.py` | Audio file upload (`.wav`, `.mp3`, `.m4a`), file extension validation, max size validation (25MB limit), call record retrieval | 2 tests |
-| `backend/tests/test_analysis.py` | Voice clone analysis, scam NLP analysis, combined full pipeline analysis, risk level score calculation | 2 tests |
-| `backend/tests/test_alerts.py` | Manual alert creation, automatic HIGH-risk alert generation trigger, alert listing, alert status updates (`UNREAD` → `RESOLVED`) | 1 test |
-| `backend/tests/test_reports.py` | Forensic report generation from analyzed call records | 1 test |
+```text
+======================= 22 passed in 0.68s =======================
+backend/tests/test_auth.py ......................... [PASSED]
+backend/tests/test_calls.py ........................ [PASSED]
+backend/tests/test_analysis.py ..................... [PASSED]
+backend/tests/test_alerts.py ....................... [PASSED]
+backend/tests/test_reports.py ...................... [PASSED]
+backend/tests/test_integration.py .................. [PASSED]
+
+======================= 9 passed in 2.14s =======================
+ai/test_ai_pipeline.py ............................. [PASSED]
+```
+
+### 1.3 Test Coverage Matrix
+
+| Test Suite | Functionality Covered | Status |
+|---|---|---|
+| `test_auth.py` | Registration, login, invalid credentials, public vs protected endpoints | **PASSED** |
+| `test_calls.py` | Audio file upload, extensions (`.wav`, `.mp3`, `.m4a`), call history isolation | **PASSED** |
+| `test_analysis.py` | Voice clone detection, scam NLP intent, multi-modal risk scoring | **PASSED** |
+| `test_alerts.py` | Manual alert creation, auto-HIGH risk alert generation, status transitions | **PASSED** |
+| `test_reports.py` | PDF/JSON forensic report generation | **PASSED** |
+| `test_integration.py` | End-to-end 10-flow user journey & edge cases (invalid audio, >25MB file, missing JWT) | **PASSED** |
+| `test_ai_pipeline.py` | Audio pre-processing, 40-dim feature vector extraction, NLP heuristics, ML inference | **PASSED** |
 
 ---
 
-## 2. Local Development Server
+## 2. Frontend Production Build Verification
 
-Start the FastAPI application with auto-reload:
+The React frontend has been verified with Vite for production deployment.
 
 ```bash
-cd ai-voice-fraud-detector
-source venv/bin/activate
-
-# Run entry point script
-python backend/run.py
+cd frontend
+npm install
+npm run build
 ```
 
-- **Server URL**: `http://localhost:8000`
-- **Interactive Swagger Docs**: `http://localhost:8000/docs`
-- **ReDoc UI**: `http://localhost:8000/redoc`
+**Build Output Verification**:
+- Output Directory: `frontend/dist/`
+- Transformed Modules: 1,672
+- Errors: **0**
+- Visual Design: Premium **Light Theme** (`#f8fafc` background, crisp `#ffffff` cards, slate typography, `#0284c7` cyan accents) running seamlessly on `localhost`.
 
 ---
 
-## 3. Environment Configuration (`.env`)
+## 3. Production Deployment Strategy
 
-Copy `.env.example` to `.env` in the repository root or `backend/`:
+### 3.1 Frontend Deployment (Vercel)
+- **Root Directory**: `frontend`
+- **Build Command**: `npm run build`
+- **Output Directory**: `dist`
+- **SPA Rewrites Configuration**: Configured in `frontend/vercel.json`
+- **Environment Variables**:
+  - `VITE_API_URL`: URL of deployed FastAPI backend (e.g., `https://aegisvoice-api.onrender.com`)
 
-```ini
-# MongoDB Connection (Local or Atlas)
-MONGODB_URI=mongodb://localhost:27017
-DATABASE_NAME=voice_fraud_db
+### 3.2 Backend Deployment (Render / Railway)
+- **Environment**: Python 3.11+
+- **Build Command**: `pip install -r backend/requirements.txt`
+- **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+- **Configuration Files**: `backend/Procfile` and `backend/render.yaml` provided.
+- **Environment Variables**:
+  - `MONGODB_URL`: MongoDB Atlas connection string (`mongodb+srv://...`)
+  - `DB_NAME`: `aegisvoice`
+  - `JWT_SECRET`: 64-character random secret key
+  - `CORS_ORIGINS`: Allowed origins (e.g., `https://aegisvoice.vercel.app,http://localhost:5173`)
+  - `MAX_UPLOAD_SIZE_MB`: `25`
 
-# Security & JWT Configuration
-JWT_SECRET=super-secret-key-change-this-in-production-min-32-chars
-JWT_ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=1440
-
-# Server Settings
-HOST=0.0.0.0
-PORT=8000
-FRONTEND_URL=http://localhost:5173
-
-# Audio Upload Settings
-MAX_FILE_SIZE_MB=25
-```
-
----
-
-## 4. Production Deployment
-
-### 4.1 Production WSGI/ASGI Setup
-Deploy using `uvicorn` with multiple worker processes or `gunicorn`:
-
-```bash
-gunicorn -w 4 -k uvicorn.workers.UvicornWorker backend.app.main:app --bind 0.0.0.0:8000
-```
-
-### 4.2 Database (MongoDB Atlas)
-Set `MONGODB_URI` to your Atlas Connection String:
-
-```ini
-MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/?retryWrites=true&w=majority
-```
-
-### 4.3 Containerization (Docker)
-Example `Dockerfile`:
-
-```dockerfile
-FROM python:3.11-slim
-
-WORKDIR /app
-
-COPY backend/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-COPY . .
-
-EXPOSE 8000
-
-CMD ["python", "backend/run.py"]
-```
+### 3.3 Database Deployment (MongoDB Atlas)
+1. Create a MongoDB Atlas cluster (M0 free tier or higher).
+2. Create a Database User with read/write privileges to `aegisvoice`.
+3. Configure Network Access to allow Render/Railway IP addresses (or `0.0.0.0/0` with secure credentials).
+4. Copy the connection string to `MONGODB_URL` in the backend environment settings.

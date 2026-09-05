@@ -31,63 +31,98 @@ class AudioPreprocessor:
 
     def load_wav(self, file_path: str, max_duration_sec: Optional[float] = None, offset_sec: float = 0.0) -> Tuple[List[float], int]:
         """
-        Loads a WAV file into a normalized list of float samples [-1.0, 1.0].
-        Supports 8-bit, 16-bit, and 24/32-bit PCM with optional max_duration_sec and offset_sec.
+        Loads an audio file (WAV, MP3, M4A, AAC, FLAC, OGG) into a normalized list of float samples [-1.0, 1.0].
+        Supports librosa, soundfile, and standard wave fallbacks.
         """
         if not os.path.exists(file_path):
             raise FileNotFoundError(f"Audio file not found: {file_path}")
 
-        with wave.open(file_path, 'rb') as wf:
-            n_channels = wf.getnchannels()
-            sampwidth = wf.getsampwidth()
-            orig_sr = wf.getframerate()
-            total_frames = wf.getnframes()
+        # 1. Primary decoder: librosa (handles WAV, MP3, M4A, AAC, FLAC, OGG)
+        try:
+            import librosa
+            y, sr = librosa.load(
+                file_path,
+                sr=self.target_sr,
+                mono=True,
+                offset=offset_sec,
+                duration=max_duration_sec
+            )
+            return y.tolist(), int(sr)
+        except Exception:
+            pass
 
-            if offset_sec > 0:
-                start_frame = min(int(orig_sr * offset_sec), max(0, total_frames - 1))
-                wf.setpos(start_frame)
+        # 2. Secondary decoder: soundfile
+        try:
+            import soundfile as sf
+            data, orig_sr = sf.read(file_path, dtype='float32')
+            if data.ndim > 1:
+                data = data.mean(axis=1)
+            samples = data.tolist()
+            if offset_sec > 0 or max_duration_sec is not None:
+                start = int(orig_sr * offset_sec)
+                end = int(orig_sr * (offset_sec + max_duration_sec)) if max_duration_sec else len(samples)
+                samples = samples[start:end]
+            if orig_sr != self.target_sr:
+                samples = self.resample(samples, orig_sr, self.target_sr)
+            return samples, self.target_sr
+        except Exception:
+            pass
+
+        # 3. Fallback decoder: standard library wave module (WAV format only)
+        try:
+            with wave.open(file_path, 'rb') as wf:
+                n_channels = wf.getnchannels()
+                sampwidth = wf.getsampwidth()
+                orig_sr = wf.getframerate()
+                total_frames = wf.getnframes()
+
+                if offset_sec > 0:
+                    start_frame = min(int(orig_sr * offset_sec), max(0, total_frames - 1))
+                    wf.setpos(start_frame)
+                else:
+                    start_frame = 0
+
+                if max_duration_sec is not None and max_duration_sec > 0:
+                    n_frames = min(int(orig_sr * max_duration_sec), total_frames - start_frame)
+                else:
+                    n_frames = total_frames - start_frame
+
+                raw_data = wf.readframes(n_frames)
+
+            if sampwidth == 2:  # 16-bit PCM
+                total_samples = n_frames * n_channels
+                fmt = f"<{total_samples}h"
+                unpacked = struct.unpack(fmt, raw_data)
+                max_val = 32768.0
+                samples = [s / max_val for s in unpacked]
+            elif sampwidth == 1:  # 8-bit PCM
+                total_samples = n_frames * n_channels
+                fmt = f"<{total_samples}B"
+                unpacked = struct.unpack(fmt, raw_data)
+                samples = [(s - 128) / 128.0 for s in unpacked]
+            elif sampwidth == 4:  # 32-bit PCM
+                total_samples = n_frames * n_channels
+                fmt = f"<{total_samples}i"
+                unpacked = struct.unpack(fmt, raw_data)
+                samples = [s / 2147483648.0 for s in unpacked]
             else:
-                start_frame = 0
+                raise ValueError(f"Unsupported sample width: {sampwidth * 8} bits")
 
-            if max_duration_sec is not None and max_duration_sec > 0:
-                n_frames = min(int(orig_sr * max_duration_sec), total_frames - start_frame)
-            else:
-                n_frames = total_frames - start_frame
+            # Convert stereo to mono if necessary
+            if n_channels > 1:
+                mono_samples = []
+                for i in range(0, len(samples), n_channels):
+                    avg_val = sum(samples[i:i + n_channels]) / n_channels
+                    mono_samples.append(avg_val)
+                samples = mono_samples
 
-            raw_data = wf.readframes(n_frames)
+            # Resample if sample rate differs from target_sr
+            if orig_sr != self.target_sr:
+                samples = self.resample(samples, orig_sr, self.target_sr)
 
-        if sampwidth == 2:  # 16-bit PCM
-            total_samples = n_frames * n_channels
-            fmt = f"<{total_samples}h"
-            unpacked = struct.unpack(fmt, raw_data)
-            max_val = 32768.0
-            samples = [s / max_val for s in unpacked]
-        elif sampwidth == 1:  # 8-bit PCM
-            total_samples = n_frames * n_channels
-            fmt = f"<{total_samples}B"
-            unpacked = struct.unpack(fmt, raw_data)
-            samples = [(s - 128) / 128.0 for s in unpacked]
-        elif sampwidth == 4:  # 32-bit PCM
-            total_samples = n_frames * n_channels
-            fmt = f"<{total_samples}i"
-            unpacked = struct.unpack(fmt, raw_data)
-            samples = [s / 2147483648.0 for s in unpacked]
-        else:
-            raise ValueError(f"Unsupported sample width: {sampwidth * 8} bits")
-
-        # Convert stereo to mono if necessary
-        if n_channels > 1:
-            mono_samples = []
-            for i in range(0, len(samples), n_channels):
-                avg_val = sum(samples[i:i + n_channels]) / n_channels
-                mono_samples.append(avg_val)
-            samples = mono_samples
-
-        # Resample if sample rate differs from target_sr
-        if orig_sr != self.target_sr:
-            samples = self.resample(samples, orig_sr, self.target_sr)
-
-        return samples, self.target_sr
+            return samples, self.target_sr
+        except Exception as e:
+            raise ValueError(f"Could not decode audio file '{os.path.basename(file_path)}': {str(e)}")
 
     def resample(self, samples: List[float], orig_sr: int, target_sr: int) -> List[float]:
         """

@@ -1,21 +1,21 @@
-// Mock dataset for AI Voice Fraud Detection & Prevention System
+// Mock dataset for AI Voice Fraud Detection & Prevention System - Indian Cyber Security Domain
 
 export const mockUser = {
   id: "usr_soc_0941",
-  full_name: "Prathna (Lead UI-UX Analyst)",
-  email: "prathna@aegisvoice.defense",
-  role: "Lead Cybersecurity Analyst / SOC Tier-2",
+  full_name: "Prathna (Lead Cyber Analyst)",
+  email: "prathna@aegisvoice.in",
+  role: "Lead Cybersecurity Analyst / Cyber Crime Cell",
   clearance_level: "TOP_SECRET_VOICE_INTEL",
   created_at: "2026-08-15T09:30:00Z",
-  organization: "Global AI Defense Consortium",
+  organization: "Indian Cyber Crime Coordination Centre (I4C)",
 };
 
 export const mockCalls = [
   {
     _id: "call_948201",
     id: "call_948201",
-    caller_number: "+1 (415) 890-2144 (Spoofed Executive Line)",
-    phone_number: "+1 (415) 890-2144",
+    caller_number: "+91 98765 43210 (Spoofed Executive Line - Mumbai)",
+    phone_number: "+91 98765 43210",
     created_at: new Date(Date.now() - 1000 * 60 * 12).toISOString(), // 12 mins ago
     duration: 68,
     duration_str: "01:08",
@@ -23,9 +23,9 @@ export const mockCalls = [
     confidence: 0.98,
     status: "fraud",
     is_synthetic: true,
-    scam_type: "CEO Deepfake Urgent Wire Transfer",
+    scam_type: "CEO Deepfake Urgent IMPS Fund Transfer",
     audio_url: "https://example.com/audio/sample_deepfake_1.wav",
-    transcript: "David, it's Richard. I'm in a closed-door meeting with the board and our acquisition partners. We need an immediate wire transfer of $250,000 to escrow account 8492. Do not discuss this with anyone until the press release tomorrow. Read back the one-time authorization code on your screen now to finalize.",
+    transcript: "Rajesh, this is Vikram. I'm in an urgent closed-door board meeting in Delhi with our investors. We need an immediate IMPS transfer of ₹2,50,000 to escrow account 4892. Do not discuss this with anyone until the official announcement. Read back the OTP sent to your phone right now to authorize.",
     voice_analysis: {
       is_synthetic: true,
       synthetic_score: 0.96,
@@ -39,18 +39,18 @@ export const mockCalls = [
       scam_type: "Executive Voice Clone & Financial Extortion",
       urgency_level: "CRITICAL",
       tactics: [
-        { name: "Urgency Pressure", detected: true, description: "Demands immediate action under threat of deal collapse" },
-        { name: "Authority Impersonation", detected: true, description: "Cloned voice of Company CEO / Executive Director" },
-        { name: "Financial Extraction", detected: true, description: "Requests immediate wire transfer to unverified escrow" },
-        { name: "Secrecy Coercion", detected: true, description: "Explicit instruction to withhold details from staff" },
+        { name: "Urgency Pressure", detected: true, description: "Demands immediate IMPS transaction under threat of deal collapse" },
+        { name: "Authority Impersonation", detected: true, description: "Cloned voice of Director / Company Executive" },
+        { name: "Financial Extraction", detected: true, description: "Requests immediate transfer of ₹2,50,000 to unverified account" },
+        { name: "Secrecy Coercion", detected: true, description: "Explicit instruction to withhold details from finance team" },
       ],
     },
   },
   {
     _id: "call_948202",
     id: "call_948202",
-    caller_number: "+1 (202) 555-0182 (Washington DC)",
-    phone_number: "+1 (202) 555-0182",
+    caller_number: "+91 94123 88901 (New Delhi - Cyber Police Spoof)",
+    phone_number: "+91 94123 88901",
     created_at: new Date(Date.now() - 1000 * 60 * 45).toISOString(), // 45 mins ago
     duration: 114,
     duration_str: "01:54",
@@ -58,8 +58,8 @@ export const mockCalls = [
     confidence: 0.95,
     status: "fraud",
     is_synthetic: true,
-    scam_type: "Federal Enforcement Warrant & Tax Extortion",
-    transcript: "This is Officer Miller from Federal Enforcement. Your account has been permanently suspended due to international illicit wire activities. You must verify your identity immediately by reading back the one-time 6-digit security code sent to your mobile phone. Failure to do so will result in an arrest warrant within 30 minutes.",
+    scam_type: "CBI Digital Arrest & Illegal Parcel Coercion",
+    transcript: "This is Inspector Sharma from Crime Branch New Delhi. A parcel containing contraband linked to your Aadhaar card was intercepted at Customs. You are placed under Digital Arrest. Verify your identity by reading back the 6-digit OTP dispatched to your mobile or police will arrest you within 30 minutes.",
     voice_analysis: {
       is_synthetic: true,
       synthetic_score: 0.88,
@@ -70,12 +70,12 @@ export const mockCalls = [
     },
     scam_analysis: {
       scam_score: 91,
-      scam_type: "Law Enforcement Impersonation & Arrest Threat",
+      scam_type: "Law Enforcement Impersonation & Digital Arrest",
       urgency_level: "CRITICAL",
       tactics: [
-        { name: "Urgency Pressure", detected: true, description: "Threatens legal detention within 30 minutes" },
-        { name: "Authority Impersonation", detected: true, description: "Claims to represent Federal Agency Enforcement" },
-        { name: "Credential Harvesting", detected: true, description: "Demands 6-digit authentication token" },
+        { name: "Urgency Pressure", detected: true, description: "Threatens police detention within 30 minutes" },
+        { name: "Authority Impersonation", detected: true, description: "Claims to represent Crime Branch & Central Agency" },
+        { name: "Credential Harvesting", detected: true, description: "Demands 6-digit OTP authentication token" },
         { name: "Secrecy Coercion", detected: false, description: "Standard intimidation protocol" },
       ],
     },
@@ -83,8 +83,8 @@ export const mockCalls = [
   {
     _id: "call_948203",
     id: "call_948203",
-    caller_number: "+1 (800) 432-1000 (Spoofed Bank Support)",
-    phone_number: "+1 (800) 432-1000",
+    caller_number: "+91 1800 123 4567 (Spoofed SBI Fraud Desk)",
+    phone_number: "+91 1800 123 4567",
     created_at: new Date(Date.now() - 1000 * 60 * 120).toISOString(), // 2 hours ago
     duration: 82,
     duration_str: "01:22",
@@ -93,7 +93,7 @@ export const mockCalls = [
     status: "fraud",
     is_synthetic: false,
     scam_type: "Banking Fraud Alert & OTP Harvesting",
-    transcript: "Security alert from Fraud Prevention. Suspicious debit charges detected on your card. To reverse these fraudulent transactions, please speak your 6-digit security pin and read the text confirmation code dispatched to your handset immediately.",
+    transcript: "Security alert from SBI Fraud Prevention Desk. Suspicious debit of ₹14,500 detected on your account. To reverse these fraudulent charges, speak your 6-digit UPI PIN and read the text OTP code sent to your handset immediately.",
     voice_analysis: {
       is_synthetic: false,
       synthetic_score: 0.32,
@@ -108,7 +108,7 @@ export const mockCalls = [
       urgency_level: "HIGH",
       tactics: [
         { name: "Urgency Pressure", detected: true, description: "Manufactured emergency surrounding bank assets" },
-        { name: "Authority Impersonation", detected: true, description: "Poses as Fraud Prevention Department" },
+        { name: "Authority Impersonation", detected: true, description: "Poses as SBI Fraud Prevention Department" },
         { name: "Credential Harvesting", detected: true, description: "Solicits PIN and OTP tokens" },
         { name: "Secrecy Coercion", detected: false, description: "Standard conversational flow" },
       ],
@@ -117,17 +117,17 @@ export const mockCalls = [
   {
     _id: "call_948204",
     id: "call_948204",
-    caller_number: "+1 (646) 321-9988 (New York, NY)",
-    phone_number: "+1 (646) 321-9988",
+    caller_number: "+91 98200 11223 (Mumbai)",
+    phone_number: "+91 98200 11223",
     created_at: new Date(Date.now() - 1000 * 60 * 240).toISOString(),
-    duration: 45,
-    duration_str: "00:45",
+    duration: 27,
+    duration_str: "00:27",
     risk_score: 52,
     confidence: 0.86,
     status: "suspicious",
     is_synthetic: false,
-    scam_type: "High Pressure Sales & Crypto Telemarketing",
-    transcript: "Hey there! We have a limited-time crypto allocation window closing in two hours. You need to verify your wallet address now before the initial price explodes. Sign up at the link we send you right now.",
+    scam_type: "High Pressure Crypto & Stock Tip Telemarketing",
+    transcript: "Namaste! We have a limited-time stock allocation window closing in two hours. You need to verify your Demat account now before the IPO price explodes. Register at the link we sent to your WhatsApp immediately.",
     voice_analysis: {
       is_synthetic: false,
       synthetic_score: 0.15,
@@ -151,8 +151,8 @@ export const mockCalls = [
   {
     _id: "call_948205",
     id: "call_948205",
-    caller_number: "+1 (512) 400-2211 (Austin, TX)",
-    phone_number: "+1 (512) 400-2211",
+    caller_number: "+91 98450 99887 (Bengaluru)",
+    phone_number: "+91 98450 99887",
     created_at: new Date(Date.now() - 1000 * 60 * 360).toISOString(),
     duration: 94,
     duration_str: "01:34",
@@ -161,7 +161,7 @@ export const mockCalls = [
     status: "safe",
     is_synthetic: false,
     scam_type: null,
-    transcript: "Good morning! This is Sarah from IT Support following up on ticket number 4920 regarding your dual-monitor docking station. Let me know when you are at your desk so we can configure the firmware update.",
+    transcript: "Good morning! This is Priya from IT Helpdesk Bengaluru following up on ticket number 4920 regarding your laptop software update. Let me know when you are at your desk so we can configure the VPN.",
     voice_analysis: {
       is_synthetic: false,
       synthetic_score: 0.08,
@@ -185,8 +185,8 @@ export const mockCalls = [
   {
     _id: "call_948206",
     id: "call_948206",
-    caller_number: "+1 (212) 990-4433 (New York, NY)",
-    phone_number: "+1 (212) 990-4433",
+    caller_number: "+91 98300 44332 (Kolkata)",
+    phone_number: "+91 98300 44332",
     created_at: new Date(Date.now() - 1000 * 60 * 500).toISOString(),
     duration: 152,
     duration_str: "02:32",
@@ -195,14 +195,16 @@ export const mockCalls = [
     status: "safe",
     is_synthetic: false,
     scam_type: null,
-    transcript: "Hello team, calling in for our scheduled weekly infrastructure synchronization. We verified the cluster backups and all MongoDB Atlas replicas are green. We will send the review notes over email this afternoon.",
+    transcript: "Namaste team, calling in for our scheduled weekly infrastructure sync. We verified the cluster backups and all database replicas in Mumbai region are healthy.",
     voice_analysis: {
       is_synthetic: false,
-      synthetic_score: 0.05,
+      synthetic_score: 0.042,
+      synthetic_probability: 4.2,
+      human_probability: 95.8,
       confidence: 0.99,
-      spectral_artifacts: 0.04,
-      pitch_consistency: 0.95,
-      clone_similarity: 0.02,
+      spectral_artifacts: 0.041,
+      pitch_consistency: 0.952,
+      clone_similarity: 0.024,
     },
     scam_analysis: {
       scam_score: 5,
@@ -238,15 +240,10 @@ export const saveMockCall = (newCall) => {
 };
 
 export const checkMockMode = () => {
-  // 1. Manual user toggle in Navbar (localStorage) takes top priority
   const localToggle = localStorage.getItem("aegis_mock_mode");
   if (localToggle !== null) return localToggle === "true";
-
-  // 2. Otherwise use environment variable if defined
   if (import.meta.env.VITE_USE_MOCK_DATA !== undefined) {
     return import.meta.env.VITE_USE_MOCK_DATA === "true";
   }
-
-  // 3. Default to true
-  return true;
+  return false;
 };

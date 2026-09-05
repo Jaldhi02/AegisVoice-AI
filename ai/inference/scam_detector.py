@@ -153,9 +153,23 @@ def analyze_scam(text):
     scam_detected = bool(is_scam)
     scam_confidence = float(round(scam_prob if is_scam else (1.0 - scam_prob), 4))
 
+    reasons = []
+    if scam_detected:
+        cat = raw.get("primary_category")
+        if cat and cat not in ("LEGITIMATE_CONVERSATION", "EMPTY_INPUT"):
+            reasons.append(f"Scam intent detected ({cat.replace('_', ' ').title()})")
+        else:
+            reasons.append("Conversational scam pattern detected")
+        triggers = raw.get("detected_triggers", [])
+        if triggers:
+            reasons.append(f"Suspicious trigger keywords: {', '.join(triggers[:4])}")
+    else:
+        reasons.append("No conversational fraud detected")
+
     return {
         "scam_detected": scam_detected,
         "scam_confidence": scam_confidence,
+        "reasons": reasons,
         **raw
     }
 

@@ -9,9 +9,9 @@ export const getRiskMeta = (riskInput) => {
     return {
       level: "UNKNOWN",
       label: "Pending",
-      bgClass: "bg-slate-800/80 text-slate-300 border-slate-700",
+      bgClass: "bg-slate-100 text-slate-700 border-slate-200",
       icon: HelpCircle,
-      textColor: "text-slate-400",
+      textColor: "text-slate-600",
       accent: "slate",
     };
   }
@@ -32,9 +32,9 @@ export const getRiskMeta = (riskInput) => {
       return {
         level: "LOW",
         label: "Safe Voice",
-        bgClass: "bg-emerald-950/60 text-emerald-400 border-emerald-600/40 hover:bg-emerald-900/60",
+        bgClass: "bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100 font-medium",
         icon: ShieldCheck,
-        textColor: "text-emerald-400",
+        textColor: "text-emerald-700",
         accent: "emerald",
       };
     case "medium":
@@ -42,9 +42,9 @@ export const getRiskMeta = (riskInput) => {
       return {
         level: "MEDIUM",
         label: "Suspicious",
-        bgClass: "bg-amber-950/60 text-amber-300 border-amber-500/40 hover:bg-amber-900/60",
+        bgClass: "bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100 font-medium",
         icon: AlertTriangle,
-        textColor: "text-amber-400",
+        textColor: "text-amber-700",
         accent: "amber",
       };
     case "high":
@@ -52,27 +52,27 @@ export const getRiskMeta = (riskInput) => {
       return {
         level: "HIGH",
         label: "Fraud Detected",
-        bgClass: "bg-rose-950/60 text-rose-400 border-rose-600/40 hover:bg-rose-900/60",
+        bgClass: "bg-rose-50 text-rose-800 border-rose-200 hover:bg-rose-100 font-medium",
         icon: ShieldAlert,
-        textColor: "text-rose-400",
+        textColor: "text-rose-700",
         accent: "rose",
       };
     case "critical":
       return {
         level: "CRITICAL",
         label: "Critical Threat",
-        bgClass: "bg-red-950/80 text-red-300 border-red-500 shadow-sm shadow-red-500/30 animate-pulse",
+        bgClass: "bg-red-100 text-red-900 border-red-300 font-bold shadow-sm animate-pulse",
         icon: AlertOctagon,
-        textColor: "text-red-400",
+        textColor: "text-red-700",
         accent: "red",
       };
     default:
       return {
         level: "UNKNOWN",
         label: String(riskInput).toUpperCase(),
-        bgClass: "bg-slate-800/80 text-slate-300 border-slate-700",
+        bgClass: "bg-slate-100 text-slate-700 border-slate-200 font-medium",
         icon: HelpCircle,
-        textColor: "text-slate-400",
+        textColor: "text-slate-600",
         accent: "slate",
       };
   }

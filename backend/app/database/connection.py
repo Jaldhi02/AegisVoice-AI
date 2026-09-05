@@ -43,7 +43,9 @@ async def connect_to_mongo():
         await alerts_col.create_index([("user_id", 1), ("created_at", -1)])
 
     except Exception as e:
-        logger.warning(f"MongoDB connection warning (will retry upon requests or continue with mock fallback): {e}")
+        logger.warning(f"MongoDB connection warning: {e}. Falling back to in-memory store.")
+        db_instance.client = None
+        db_instance.db = None
 
 async def close_mongo_connection():
     """Closes MongoDB connection pool."""
